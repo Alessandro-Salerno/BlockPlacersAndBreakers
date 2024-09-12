@@ -1,28 +1,22 @@
 package io.github.eirikh1996.blockplacersandbreakers;
 
-import br.net.fabiozumbi12.RedProtect.Bukkit.RedProtect;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import io.github.eirikh1996.blockplacersandbreakers.listener.BlockListener;
 import io.github.eirikh1996.blockplacersandbreakers.listener.InteractListener;
 import io.github.eirikh1996.blockplacersandbreakers.objects.BlockBreaker;
 import io.github.eirikh1996.blockplacersandbreakers.objects.BlockPlacer;
 import io.github.eirikh1996.blockplacersandbreakers.update.UpdateManager;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
-import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Dispenser;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
 import java.util.*;
-import java.util.logging.Logger;
 
 import static io.github.eirikh1996.blockplacersandbreakers.Messages.TAB;
 
@@ -31,9 +25,6 @@ public class BlockPlacersAndBreakers extends JavaPlugin {
     private final Set<BlockPlacer> blockPlacers = new HashSet<>();
     private final Set<BlockBreaker> blockBreakers = new HashSet<>();
     private final File file = new File(getDataFolder(),"placersandbreakers.yml");
-    private Economy economy;
-    private WorldGuardPlugin worldGuardPlugin;
-    private RedProtect redProtectPlugin;
     private GriefPrevention griefPreventionPlugin;
 
     @Override
@@ -43,62 +34,56 @@ public class BlockPlacersAndBreakers extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        String packageName = this.getServer().getClass().getPackage().getName();
-        String version = packageName.substring(packageName.lastIndexOf('.') + 1);
-        String[] parts = version.split("_");
-        int versionNumber = Integer.valueOf(parts[1]);
-
         saveResource("placersandbreakers.yml",false);
 
-        Settings.is1_13 = versionNumber > 12;
+        Settings.is1_13 = true;
         if (Settings.is1_13){
             saveDefaultConfig();
         } else {
             saveLegacyConfig();
         }
         UpdateManager.initialize();
-        Settings.debug = getConfig().getBoolean("debug", false);
+//        Settings.debug = getConfig().getBoolean("debug", false);
         getLogger().info("Detected server version: " + getServer().getVersion());
         blockBreakers.addAll(getBlockBreakersFromFile());
-        blockPlacers.addAll(getBlockPlacersFromFile());
         Settings.tool = Material.getMaterial(getConfig().getString("Tool", Settings.is1_13 ? "WOODEN_HOE" : "WOOD_HOE"));
         Settings.ApplyDamageToBreakerPickaxe = getConfig().getBoolean("ApplyDamageToBreakerPickaxe", true);
         this.getCommand("BlockPlacersAndBreakers").setExecutor(new MainCommand(this));
         //Check for WorldGuard
-        Plugin wgPlugin = getServer().getPluginManager().getPlugin("WorldGuard");
-        if (wgPlugin != null){
-            if (wgPlugin instanceof WorldGuardPlugin){
-                worldGuardPlugin = (WorldGuardPlugin) wgPlugin;
-                getLogger().info("Found a compatible version of WorldGuard. Enabling WorldGuard integration");
-            }
-        }
-        //Check for RedProtect
-        Plugin rp = getServer().getPluginManager().getPlugin("RedProtect");
-        if (rp instanceof RedProtect){
-            getLogger().info("Found a compatible version of RedProtect. Enabling RedProtect integration");
-            redProtectPlugin = (RedProtect) rp;
-        }
-        //Check for GriefPrevention
-        Plugin gp = getServer().getPluginManager().getPlugin("GriefPrevention");
-        if (gp instanceof GriefPrevention){
-            getLogger().info("Found a compatible version of GriefPrevention. Enabling RedProtect integration");
-            griefPreventionPlugin = (GriefPrevention) gp;
-        }
-        //Check for Vault
-        if (getServer().getPluginManager().getPlugin("Vault") != null){
-            RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
-            if (rsp != null){
-                getLogger().info("Found a compatible version of Vault. Enabling Vault integration");
-                Settings.BreakerCreateCost = getConfig().getLong("BreakerCreateCost", 1000);
-                Settings.PlacerCreateCost = getConfig().getLong("PlacerCreateCost", 1000);
-                economy = rsp.getProvider();
-            } else {
-                getLogger().info("BlockPlacersAndBreakers did not find a compatible version of Vault. Disabling Vault integration");
-                Settings.BreakerCreateCost = 0;
-                Settings.PlacerCreateCost = 0;
-                economy = null;
-            }
-        }
+//        Plugin wgPlugin = getServer().getPluginManager().getPlugin("WorldGuard");
+//        if (wgPlugin != null){
+//            if (wgPlugin instanceof WorldGuardPlugin){
+//                worldGuardPlugin = (WorldGuardPlugin) wgPlugin;
+//                getLogger().info("Found a compatible version of WorldGuard. Enabling WorldGuard integration");
+//            }
+//        }
+//        //Check for RedProtect
+//        Plugin rp = getServer().getPluginManager().getPlugin("RedProtect");
+//        if (rp instanceof RedProtect){
+//            getLogger().info("Found a compatible version of RedProtect. Enabling RedProtect integration");
+//            redProtectPlugin = (RedProtect) rp;
+//        }
+//        //Check for GriefPrevention
+//        Plugin gp = getServer().getPluginManager().getPlugin("GriefPrevention");
+//        if (gp instanceof GriefPrevention){
+//            getLogger().info("Found a compatible version of GriefPrevention. Enabling RedProtect integration");
+//            griefPreventionPlugin = (GriefPrevention) gp;
+//        }
+//        //Check for Vault
+//        if (getServer().getPluginManager().getPlugin("Vault") != null){
+//            RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+//            if (rsp != null){
+//                getLogger().info("Found a compatible version of Vault. Enabling Vault integration");
+//                Settings.BreakerCreateCost = getConfig().getLong("BreakerCreateCost", 1000);
+//                Settings.PlacerCreateCost = getConfig().getLong("PlacerCreateCost", 1000);
+//                economy = rsp.getProvider();
+//            } else {
+//                getLogger().info("BlockPlacersAndBreakers did not find a compatible version of Vault. Disabling Vault integration");
+//                Settings.BreakerCreateCost = 0;
+//                Settings.PlacerCreateCost = 0;
+//                economy = null;
+//            }
+//        }
 
         getServer().getPluginManager().registerEvents(new BlockListener(),this);
         getServer().getPluginManager().registerEvents(new InteractListener(),this);
@@ -118,16 +103,16 @@ public class BlockPlacersAndBreakers extends JavaPlugin {
         return blockPlacers;
     }
 
-    public Economy getEconomy() {
-        return economy;
+    public Object getEconomy() {
+        return null;
     }
 
-    public WorldGuardPlugin getWorldGuardPlugin() {
-        return worldGuardPlugin;
+    public Object getWorldGuardPlugin() {
+        return null;
     }
 
-    public RedProtect getRedProtectPlugin() {
-        return redProtectPlugin;
+    public Object getRedProtectPlugin() {
+        return null;
     }
 
     public GriefPrevention getGriefPreventionPlugin() {

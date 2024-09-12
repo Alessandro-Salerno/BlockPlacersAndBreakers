@@ -1,13 +1,11 @@
 package io.github.eirikh1996.blockplacersandbreakers.listener;
 
-import br.net.fabiozumbi12.RedProtect.Bukkit.Region;
 import io.github.eirikh1996.blockplacersandbreakers.BlockPlacersAndBreakers;
 import io.github.eirikh1996.blockplacersandbreakers.Settings;
 import io.github.eirikh1996.blockplacersandbreakers.events.BlockBreakerCreateEvent;
 import io.github.eirikh1996.blockplacersandbreakers.events.BlockPlacerCreateEvent;
 import io.github.eirikh1996.blockplacersandbreakers.objects.BlockBreaker;
 import io.github.eirikh1996.blockplacersandbreakers.objects.BlockPlacer;
-import io.github.eirikh1996.blockplacersandbreakers.utils.WorldGuardUtils;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Dispenser;
@@ -22,7 +20,7 @@ import static io.github.eirikh1996.blockplacersandbreakers.Messages.BPB_PREFIX;
 import static io.github.eirikh1996.blockplacersandbreakers.Messages.ERROR;
 
 public class InteractListener implements Listener {
-    private Economy eco = BlockPlacersAndBreakers.getInstance().getEconomy();
+    private Economy eco = null;
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDispenserClick(PlayerInteractEvent event){
         if (event.getItem() == null)
@@ -55,17 +53,6 @@ public class InteractListener implements Listener {
                 p.sendMessage(BPB_PREFIX + "This dispenser is no longer a block placer");
                 bpb.getBlockPlacers().remove(BlockPlacer.at(d.getLocation()));
             } else {
-                if (bpb.getWorldGuardPlugin() != null && !WorldGuardUtils.allowedToBuild(p, d.getLocation())){
-                    p.sendMessage(BPB_PREFIX + ERROR + "You cannot create a block placer in this WorldGuard region!");
-                    return;
-                }
-                if (bpb.getRedProtectPlugin() != null){
-                    Region region = bpb.getRedProtectPlugin().getAPI().getRegion(d.getLocation());
-                    if (region != null && !region.canBuild(p)){
-                        p.sendMessage(BPB_PREFIX + ERROR + "You cannot create a block placer in this RedProtect region!");
-                        return;
-                    }
-                }
 
                 if (bpb.getGriefPreventionPlugin() != null){
                     if (bpb.getGriefPreventionPlugin().allowBuild(event.getPlayer(), d.getLocation()) != null){
@@ -124,17 +111,6 @@ public class InteractListener implements Listener {
                 d.setCustomName(null);
                 bpb.getBlockBreakers().remove(BlockBreaker.at(d.getLocation()));
             } else {
-                if (bpb.getWorldGuardPlugin() != null && !WorldGuardUtils.allowedToBuild(p, d.getLocation())){
-                    p.sendMessage(BPB_PREFIX + ERROR + "You cannot create a block breaker in this WorldGuard region!");
-                    return;
-                }
-                if (bpb.getRedProtectPlugin() != null){
-                    Region region = bpb.getRedProtectPlugin().getAPI().getRegion(d.getLocation());
-                    if (region != null && !region.canBuild(p)){
-                        p.sendMessage(BPB_PREFIX + ERROR + "You cannot create a block breaker in this RedProtect region!");
-                        return;
-                    }
-                }
                 if (bpb.getGriefPreventionPlugin() != null){
                     if (bpb.getGriefPreventionPlugin().allowBuild(event.getPlayer(), d.getLocation()) != null){
                         p.sendMessage(BPB_PREFIX + ERROR + "You cannot create a block breaker in this GriefPrevention claim!");

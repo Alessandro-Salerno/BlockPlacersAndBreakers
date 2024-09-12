@@ -1,14 +1,11 @@
 package io.github.eirikh1996.blockplacersandbreakers.listener;
 
-import br.net.fabiozumbi12.RedProtect.Bukkit.RedProtect;
-import br.net.fabiozumbi12.RedProtect.Bukkit.Region;
 import io.github.eirikh1996.blockplacersandbreakers.BlockPlacersAndBreakers;
 import io.github.eirikh1996.blockplacersandbreakers.Settings;
 import io.github.eirikh1996.blockplacersandbreakers.events.BlockBreakerBreakBlockEvent;
 import io.github.eirikh1996.blockplacersandbreakers.events.BlockPlacerPlaceBlockEvent;
 import io.github.eirikh1996.blockplacersandbreakers.objects.BlockBreaker;
 import io.github.eirikh1996.blockplacersandbreakers.objects.BlockPlacer;
-import io.github.eirikh1996.blockplacersandbreakers.utils.WorldGuardUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -284,22 +281,8 @@ public class BlockListener implements Listener {
             face = disp.getFacing();
         }
         Location relative = d.getBlock().getRelative(face).getLocation();
-        if (BlockPlacersAndBreakers.getInstance().getRedProtectPlugin() != null){
-            RedProtect rp = BlockPlacersAndBreakers.getInstance().getRedProtectPlugin();
-            Region rg = rp.getAPI().getRegion(relative);
-            if (rg != null && !rg.canBuild(event.getPlayer())){
-                Bukkit.broadcastMessage(String.valueOf(event.getPlayer()));
-                event.getPlayer().sendMessage(BPB_PREFIX + ERROR + "Block placers or breakers cannot place nor break blocks in this RedProtect region!");
-                event.setCancelled(true);
-            }
-        }
-        else if (BlockPlacersAndBreakers.getInstance().getWorldGuardPlugin() != null){
-            if (!WorldGuardUtils.allowedToBuild(event.getPlayer(), relative)){
-                event.getPlayer().sendMessage(BPB_PREFIX + ERROR + "Block placers or breakers cannot place nor break blocks in this WorldGuard region!");
-                event.setCancelled(true);
-            }
-        }
-        else if (bpb.getGriefPreventionPlugin() != null){
+
+        if (bpb.getGriefPreventionPlugin() != null){
             if (bpb.getGriefPreventionPlugin().allowBuild(event.getPlayer(), relative) != null){
                 event.getPlayer().sendMessage(BPB_PREFIX + ERROR + "Block placers or breakers cannot place nor break blocks in this GriefPrevention claim!");
                 event.setCancelled(true);
