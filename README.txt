@@ -1,5 +1,5 @@
 This branch contains a version of the BlockPlacersAndBreakers Server-Side Plugin compatible with Minecraft version 1.21.1.
-This contribution was made by Alessandro Salerno (https://github.com/Alessandro-Salerno) on Sept 12th, 2024. 
+This contribution was submitted by Alessandro Salerno (https://github.com/Alessandro-Salerno) on Sept 12th, 2024. 
 
 Features added:
 + Works on 1.21.1 and newer versions in general (probably)
